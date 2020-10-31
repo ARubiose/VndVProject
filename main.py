@@ -4,6 +4,8 @@ from functions import *
 class BookItShell(cmd.Cmd):
     intro = 'Welcome to Book it.   Type help to list commands.\n'
     prompt = '(Book it) '
+    bookings = {}
+    available_rooms = {}
 
     # ----- commands ----- #
     def do_dummyfunction(self, arg):
@@ -13,4 +15,5 @@ class BookItShell(cmd.Cmd):
         exit(0)
 
 if __name__ == '__main__':
+    #  Check booking file 
     BookItShell().cmdloop()

@@ -1,0 +1,26 @@
+{
+    "S":{
+        "SM":
+            {
+                "Balcony":1,
+                "NoBalcony":2
+            },
+        "DB":
+            {
+                "Balcony":1,
+                "NoBalcony":2
+            }
+    },
+    "G":{
+        "SM":
+            {
+                "Balcony":1,
+                "NoBalcony":2
+            },
+        "DB":
+            {
+                "Balcony":1,
+                "NoBalcony":2
+            }
+    }
+}

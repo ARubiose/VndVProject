@@ -1,0 +1,35 @@
+
+{
+    "31/10/2020":{
+        "[Timestamp]":{
+            "IDClient":"DNI",
+            "Lastname":"Nombre",
+            "Type":"", // Values : L, G, S, P
+            "Size":"", // Values : SM, DB
+            "Balcony":"" // Values: True, False
+        },
+        "[Timestamp]2":{
+            "IDClient":"DNI",
+            "Lastname":"Nombre",
+            "Type":"",
+            "Size":"",
+            "Balcony":""
+        }
+    }, 
+    "31/1/11/2020":{
+        "[Timestamp]":{
+            "IDClient":"DNI",
+            "Lastname":"Nombre",
+            "Type":"",
+            "Size":"",
+            "Balcony":""
+        },
+        "[Timestamp]2":{
+            "IDClient":"DNI",
+            "Lastname":"Nombre",
+            "Type":"",
+            "Size":"",
+            "Balcony":""
+        }
+    }
+}
