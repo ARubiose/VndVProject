@@ -1,20 +1,35 @@
-import cmd, sys, sqlite3
+import cmd
+import sys 
+
+# Functions #
 from functions.guide import guide
 from functions.description import description
 from functions.availability import availability
+from functions.preference import preference
+from functions.mybookings import mybookings
+from functions.cancelbooking import cancelbooking
+from functions.booking_list import booking_list
+from functions.cancel import cancel
+
+# Database #
+from database import create_tables
+import sqlite3
 
 class BookItShell(cmd.Cmd):
-    intro = 'Welcome to Book it.   Type help to list commands.\n'
+    intro = 'Welcome to Book it.   Type guide to list commands.\n'
     prompt = '(Book it) '
-    
-    conn = sqlite3.connect('example.db')
-    c = conn.cursor()
+    conn = None
+
+    # Connection to the database #
+    def connect(self, database_file):
+        try:
+            self.conn = sqlite3.connect(database_file)
+            print("Opened database successfully")
+        except:
+            print('Error connecting to database...')
 
     # ----- commands ----- #
-    def do_dummyfunction(self, arg):
-        print('Sample function')
-
-    def do_guide(self):
+    def do_guide(self, arg):
         guide()
 
     def do_description(self, type):
@@ -29,68 +44,52 @@ class BookItShell(cmd.Cmd):
     def do_book(self, arg):
         print('test')
 
+    def do_preference(self, arg):
+        args = arg.split()
+        if (len(args) != 2) :
+            print('Invalid number of arguments')
+            return
+        preference(self.conn, args[0], args[1])
+
+    def do_mybookings(self, arg):
+        args = arg.split()
+        if (len(args) != 2) :
+            print('Invalid number of arguments')
+            return
+        mybookings(self.conn, args[0], args[1])
+
+    def do_cancelbooking(self, arg):
+        args = arg.split()
+        if (len(args) != 3) :
+            print('Invalid number of arguments')
+            return
+        cancelbooking(self.conn, args[0], args[1], args[2])
+    
+    def do_list(self, private_key):
+        booking_list(self.conn, private_key)
+    
+    def do_cancel(self, booking_ID):
+        cancel(self.conn, booking_ID)
+
     def do_exit(self, arg):
         exit(0)
 
+    # ----- override commands ----- #
+    def do_help(self, arg):
+        guide()
 
-def create_table(dbConnection, create_table_sql):
-    """ create a table from the create_table_sql statement
-    :param conn: Connection object
-    :param create_table_sql: a CREATE TABLE statement
-    :return:
-    """
-    dbConnection.execute(create_table_sql)
-
-def createTables():
-    conn = sqlite3.connect('example.db')
-    c = conn.cursor()
-
-    sql_insert_rooms = """ INSERT OR IGNORE INTO room_types(ID, TYPE, SIZE, BALCONY, QUANTITY) VALUES
-                        (1, 'l', 'sm', 0, 1),
-                        (2, 'l', 'sm', 1, 1),
-                        (3, 'l', 'db', 0, 2),
-                        (4, 'l', 'db', 1, 4),
-                        (5, 'g', 'sm', 0, 1),
-                        (6, 'g', 'sm', 1, 1),
-                        (7, 'g', 'db', 0, 3),
-                        (8, 'g', 'db', 1, 3),
-                        (9, 's', 'sm', 0, 2),
-                        (10, 's', 'sm', 1, 2),
-                        (11, 's', 'db', 0, 2),
-                        (12, 's', 'db', 1, 2),
-                        (13, 'p', 'sm', 0, 2),
-                        (14, 'p', 'sm', 1, 2),
-                        (15, 'p', 'db', 0, 2),
-                        (16, 'p', 'db', 1, 2) """
-
-    sql_create_room_types_table = """ CREATE TABLE IF NOT EXISTS room_types (
-                                    ID integer UNIQUE,
-                                    TYPE text NOT NULL,
-                                    SIZE text NOT NULL,
-                                    BALCONY boolean,
-                                    QUANTITY integer,
-                                    CONSTRAINT chk_type CHECK (TYPE IN ('l', 'g', 's', 'p', 'a')),
-                                    CONSTRAINT chk_size CHECK (SIZE IN ('sm', 'db')),
-                                    PRIMARY KEY (TYPE, SIZE, BALCONY)
-                                ); """
-
-    sql_create_bookings_table = """ CREATE TABLE IF NOT EXISTS bookings (
-                                    ID integer PRIMARY KEY,
-                                    TYPE text NOT NULL,
-                                    NAME_LASTNAME text NOT NULL,
-                                    DATE text NOT NULL,
-                                    CLIENT_ID integer NOT NULL,
-                                    FOREIGN KEY(TYPE) REFERENCES room_types(ID)
-                                ); """
-
-    if c is not None:
-        # create projects table
-        create_table(c, sql_create_bookings_table)
-        create_table(c, sql_create_room_types_table)
-        c.execute(sql_insert_rooms)
-        conn.commit()
+    def default(self, arg):
+        ''' Print a command not recognized error message '''
+        print(f" {arg} is not a valid command")
 
 if __name__ == '__main__':
-    #  Check booking file 
-    createTables()
-    BookItShell().cmdloop()
+    # Console object
+    console = BookItShell()
+
+    # Setup. Database
+    console.connect('bookings.db')
+    create_tables(console.conn)
+
+    # Console loop
+    console.cmdloop()
+    
