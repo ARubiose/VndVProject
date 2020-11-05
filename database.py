@@ -13,7 +13,8 @@ BOOKINGS_TABLE = """ CREATE TABLE IF NOT EXISTS bookings (
                                     ROOM text NOT NULL,
                                     NAME_LASTNAME text NOT NULL,
                                     DATE text NOT NULL,
-                                    CLIENT_ID integer NOT NULL
+                                    CLIENT_ID integer NOT NULL,
+                                    FOREIGN KEY (ROOM) REFERENCES room_types(rowid)
                                 ); """
                                 
 ROOMS = """ INSERT OR IGNORE INTO room_types(TYPE, SIZE, BALCONY, QUANTITY) VALUES

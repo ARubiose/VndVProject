@@ -36,7 +36,7 @@ class BookItShell(cmd.Cmd):
         description(type)
 
     def do_availability(self, type):
-        availability(type, self.c)
+        availability(type, self.conn)
 
     def do_check(self, arg):
         print('test')
