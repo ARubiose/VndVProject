@@ -30,3 +30,4 @@ def booking_list(conn, private_key):
     else:
         for booking in bookings:
             print_booking_info(booking)
+            

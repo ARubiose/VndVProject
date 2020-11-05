@@ -12,11 +12,12 @@ BOOKINGS_TABLE = """ CREATE TABLE IF NOT EXISTS bookings (
                                     ID integer PRIMARY KEY AUTOINCREMENT,
                                     ROOM text NOT NULL,
                                     NAME_LASTNAME text NOT NULL,
-                                    DATE text NOT NULL,
-                                    CLIENT_ID integer NOT NULL,
-                                    FOREIGN KEY (ROOM) REFERENCES room_types(rowid)
+                                    BOOKING_DATE text NOT NULL,
+                                    CLIENT_ID integer NOT NULL
                                 ); """
-                                
+
+""" Removed FOREIGN KEY (ROOM) REFERENCES room_types(rowid) """ 
+
 ROOMS = """ INSERT OR IGNORE INTO room_types(TYPE, SIZE, BALCONY, QUANTITY) VALUES
                         ('l', 'sm', 0, 1),
                         ('l', 'sm', 1, 1),
@@ -34,6 +35,8 @@ ROOMS = """ INSERT OR IGNORE INTO room_types(TYPE, SIZE, BALCONY, QUANTITY) VALU
                         ('p', 'sm', 1, 2),
                         ('p', 'db', 0, 2),
                         ('p', 'db', 1, 2) """
+
+balcony_dict = {"y":1,"n":0, "1":"y", "0":"n", '%':'%'}
 
 def execute_statement(connection, statement):
     connection.cursor().execute(statement)
@@ -56,5 +59,14 @@ def create_tables(conn):
         if c.fetchone()[0]==0 : 
             print('Creating table for Bookings...')
             execute_statement(conn, BOOKINGS_TABLE)
-        
 
+# Modifiable dict
+def get_rooms_quantity(conn, room_type='%', room_size='%', room_balcony='%'):
+        c = conn.cursor()
+        c.execute(f"SELECT * FROM room_types WHERE TYPE LIKE '{room_type}' AND SIZE LIKE '{room_size}' AND BALCONY LIKE '{balcony_dict[room_balcony]}'")
+        rooms = c.fetchall()
+        rooms_available = dict()
+        for room_info in rooms:
+            key = '-'.join([room_info[0], room_info[1], balcony_dict[str(room_info[2])]])
+            rooms_available.update({key:int(room_info[3])})
+        return rooms_available

@@ -1,4 +1,5 @@
-balcony_dict = {"y":1,"n":0}
+from database import get_rooms_quantity
+from functions.check import check
 
 def preference(conn, booking_ID, selection):
     """Set a preference for whether a room with balcony or without balcony if available.
@@ -32,23 +33,11 @@ def preference(conn, booking_ID, selection):
         print("Preference already satisfied")
 
     else:
-        c.execute(f"SELECT QUANTITY FROM room_types WHERE TYPE = '{room[0]}' AND SIZE = '{room[1]}' AND BALCONY = {balcony_dict[room[2]]}")
-        available_rooms = c.fetchone()[0]
+        available_rooms = check(conn, booking[3], room[0])
 
-        c.execute(f"SELECT * FROM bookings WHERE ROOM = '{room[0] + room[1] + selection}' and DATE = '{booking[3]}'")
-
-        if len(c.fetchall()) < available_rooms:
+        if available_rooms[booking[1]] > 0:
             c.execute(f"UPDATE bookings SET ROOM = '{room[0] + '-' + room[1] + '-' + selection}' where ID = {booking_ID}")
             conn.commit()
             print("Preference saved")
         else:
             print("Room not available")
-
- 
-
-    
-
-
-    
-    
-

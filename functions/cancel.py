@@ -18,8 +18,9 @@ def cancel(conn, booking_ID):
     c.execute(f"SELECT * FROM bookings WHERE ID = '{booking_ID}'")
     booking = c.fetchone()
     if booking == None:   
-        return "Error. Booking not found"
+        print ("Error. Booking not found")
     else:
         c.execute(f"DELETE FROM bookings where ID = {booking_ID}")
         conn.commit()
-        return "Booking cancelled"
+        print("Booking cancelled")
+        

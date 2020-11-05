@@ -23,4 +23,3 @@ def mybookings(conn, name_lastname, client_ID):
             print_booking_info(booking)
     else:
         print ("There is no bookings registered")
-

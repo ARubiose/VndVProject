@@ -5,6 +5,8 @@ import sys
 from functions.guide import guide
 from functions.description import description
 from functions.availability import availability
+from functions.check import check
+from functions.book import book
 from functions.preference import preference
 from functions.mybookings import mybookings
 from functions.cancelbooking import cancelbooking
@@ -35,14 +37,22 @@ class BookItShell(cmd.Cmd):
     def do_description(self, type):
         description(type)
 
-    def do_availability(self, type):
-        availability(type, self.conn)
+    def do_availability(self, month):
+        availability(self.conn, month)
 
     def do_check(self, arg):
-        print('test')
+        args = arg.split()
+        if (len(args) != 2) :
+            print('Invalid number of arguments')
+            return
+        print(check(self.conn, args[0], args[1]))
 
     def do_book(self, arg):
-        print('test')
+        args = arg.split()
+        if (len(args) != 5) :
+            print('Invalid number of arguments')
+            return
+        book(self.conn, args[0], args[1], args[2], args[3], args[4])
 
     def do_preference(self, arg):
         args = arg.split()
