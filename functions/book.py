@@ -10,14 +10,13 @@ def book(conn, booking_date, room_type, accommodation_type, name_lastname, clien
 
         Raises
         ------
-        Booking not found
+        Booking not available
             
         """
     c = conn.cursor()
     
     # Get booking availability
     available_rooms = check(conn, booking_date, room_type)
-    print(available_rooms)
     available_room = False
 
     # Balcony selection
@@ -34,4 +33,3 @@ def book(conn, booking_date, room_type, accommodation_type, name_lastname, clien
         conn.commit()
     else:
         print("Error. There is no room available")
-        

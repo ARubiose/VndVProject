@@ -14,4 +14,4 @@ def description(type):
         's': silver,
         'p': platinum,
         'a': '\n'.join([luxury, gold, silver, platinum])
-    }.get(type, 'Please insert a valid type of room.'))
+    }.get(type))

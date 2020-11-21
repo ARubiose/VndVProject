@@ -4,18 +4,18 @@ from datetime import date, timedelta
 from database import get_rooms_quantity
 
 month_dict = {
-    'January':1,
-    'February':2,
-    'March':3,
-    'April':4,
-    'May':5,
-    'June':6,
-    'July':7,
-    'August':8,
-    'September':9,
-    'October':10,
-    'November':11,
-    'December':12
+    'january':1,
+    'february':2,
+    'march':3,
+    'april':4,
+    'may':5,
+    'june':6,
+    'july':7,
+    'august':8,
+    'september':9,
+    'october':10,
+    'november':11,
+    'december':12
 }
 
 def availability(conn, month):
@@ -27,13 +27,14 @@ def availability(conn, month):
 
     current_date = date.today()
     current_month = current_date.month
+    year = current_date.year if current_date.month <= month_dict[month] else current_date.year + 1
     room_quantity = get_rooms_quantity(conn)
 
-    last_day = monthrange(current_date.year, month_dict[month])[1]
-    last_day = date(current_date.year, month_dict[month], last_day)
+    last_day = monthrange(year, month_dict[month])[1]
+    last_day = date(year, month_dict[month], last_day)
     
     start_day = current_date.day if month_dict[month] == current_month else 1
-    start_day = date(current_date.year, month_dict[month], start_day)
+    start_day = date(year, month_dict[month], start_day)
     
     c = conn.cursor() 
 
@@ -49,7 +50,7 @@ def availability(conn, month):
         for date_booking in date_bookings:
             aux_dict[date_booking[1]] -= 1
 
-        print(aux_date)
+        print(aux_date.strftime('%d-%m-%Y'))
         print(aux_dict)
         print("*******************")
 
