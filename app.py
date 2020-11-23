@@ -15,8 +15,8 @@ from functions.cancel import cancel
 from validator import *
 
 # Database #
-from database import create_tables
 import sqlite3
+from database import create_tables
 
 class BookItShell(cmd.Cmd):
     intro = 'Welcome to Book it.   Type guide to list commands.\n'
@@ -33,7 +33,7 @@ class BookItShell(cmd.Cmd):
 
     # ----- commands ----- #
     def do_guide(self, arg):
-        guide()
+        print (guide())
 
     def do_description(self, arg):
         args = arg.split()

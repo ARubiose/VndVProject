@@ -21,5 +21,6 @@ def mybookings(conn, name_lastname, client_ID):
     if bookings:   
         for booking in bookings:
             print_booking_info(booking)
+        return bookings
     else:
         print ("There is no bookings registered")

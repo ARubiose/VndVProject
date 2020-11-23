@@ -53,3 +53,4 @@ def balcony_validation(arg):
         print(f"Invalid argument#2 {arg}. Argument#2 must be y for balcony or n for no balcony.")
         return False
     return True
+    

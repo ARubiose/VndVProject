@@ -15,3 +15,4 @@ def description(type):
         'p': platinum,
         'a': '\n'.join([luxury, gold, silver, platinum])
     }.get(type))
+    

@@ -26,7 +26,7 @@ def booking_list(conn, private_key):
     c.execute(f"SELECT * FROM bookings")
     bookings = c.fetchall()
     if len(bookings) == 0:   
-        return "No bookings."
+        print("No bookings.")
     else:
         for booking in bookings:
             print_booking_info(booking)

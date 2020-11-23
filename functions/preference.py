@@ -27,6 +27,7 @@ def preference(conn, booking_ID, selection):
         return
 
     room = booking[1].split('-')
+    #Fault --> 
 
     # Update preference
     if room[2] == selection:
