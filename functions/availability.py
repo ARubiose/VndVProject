@@ -20,7 +20,7 @@ month_dict = {
 
 def availability(conn, month):
     """ Checks availability in a given type of room 
-    :param type: l for luxury, g for gold, s for silver, p for platinum or a for every room
+    :param month: name of the month to check availability for
     :param dbConnection: a connection to the DB
     :return: None
     """

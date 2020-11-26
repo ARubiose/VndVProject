@@ -9,6 +9,7 @@ import database
 import sys
 
 from functions.guide import manual
+from constants_test import *
 
 #TODO
 class TestGuide(unittest.TestCase):
@@ -22,6 +23,157 @@ class TestGuide(unittest.TestCase):
         actual_result = fake_stdout.getvalue().split()
         expected_result = manual
         self.assertEqual(actual_result, expected_result.split())
+
+class TestDescription(unittest.TestCase):
+
+    def setUp(self):
+        self.cli = app.BookItShell()
+    
+    def test_valid_description(self):
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('description l')
+        actual_result = fake_stdout.getvalue()
+        expected_result = 'Luxury Room: It is the most expensive type of room. We have 8 in total, divided into 2 single rooms (1 of them with a balcony) and 6 double rooms (4 of them with a balcony).\n'
+        self.assertEqual(actual_result, expected_result)
+
+    def test_invalid_description(self):
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('description j')
+        actual_result = fake_stdout.getvalue()
+        expected_result = 'Invalid room type j. Room type must be l, g, s or a.\n'
+        self.assertEqual(actual_result, expected_result)
+
+    def test_invalid_number_of_arguments_description(self):
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('description j k')
+        actual_result = fake_stdout.getvalue()
+        expected_result = 'Invalid number of arguments. It must be 1.\n'
+        self.assertEqual(actual_result, expected_result)
+
+class TestAvailability(unittest.TestCase):
+
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def setUp(self, outs):
+        self.cli = app.BookItShell()
+        self.cli.connect('test_database.db')
+        database.create_tables(self.cli.conn)
+
+    def tearDown(self):
+        database.execute_statement(self.cli.conn, 'DROP TABLE bookings')
+        database.execute_statement(self.cli.conn, 'DROP TABLE room_types')
+
+    def test_availability_future_month_this_year(self):
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('availability December')
+        
+        actual_result = fake_stdout.getvalue()
+        expected_result = availability_december_expected
+        self.assertEqual(actual_result, expected_result)
+
+    def test_availability_current_month(self):
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('availability november')
+
+        actual_result = fake_stdout.getvalue()
+        expected_result = availability_current_month_expected
+        self.assertEqual(actual_result, expected_result)
+
+    def test_availability_month_next_year(self):
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('availability january')
+
+        actual_result = fake_stdout.getvalue()
+        expected_result = availability_january_expected
+        self.assertEqual(actual_result, expected_result)
+
+    def test_availability_witch_active_bookings(self):
+        database.execute_statement(self.cli.conn, f"INSERT INTO bookings (ROOM, NAME_LASTNAME, BOOKING_DATE, CLIENT_ID) VALUES ('l-sm-n', 'test_name', '30-11-2020', '12345678J')")
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('availability november')
+
+        actual_result = fake_stdout.getvalue()
+        expected_result = availability_with_bookings_expected
+        self.assertEqual(actual_result, expected_result)
+
+    def test_availability_with_invalid_month(self):
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('availability januar')
+
+        actual_result = fake_stdout.getvalue()
+        expected_result = 'Invalid month januar.\n'
+        self.assertEqual(actual_result, expected_result)
+
+class TestBook(unittest.TestCase):
+
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def setUp(self, outs):
+        self.cli = app.BookItShell()
+        self.cli.connect('test_database.db')
+        database.create_tables(self.cli.conn)
+
+    def tearDown(self):
+        database.execute_statement(self.cli.conn, 'DROP TABLE bookings')
+        database.execute_statement(self.cli.conn, 'DROP TABLE room_types')
+
+    def test_book_with_available_no_balcony_rooms(self):
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('book 30-11-2020 l sm test_name 12345678J')
+
+        actual_result = fake_stdout.getvalue()
+        expected_result = 'Booking confirmed for room type l of size sm without balcony. Booking id: 1\n'
+        self.assertEqual(actual_result, expected_result)
+    
+    def test_book_with_only_balcony_rooms_available(self):
+        database.execute_statement(self.cli.conn, f"INSERT INTO bookings (ROOM, NAME_LASTNAME, BOOKING_DATE, CLIENT_ID) VALUES ('l-sm-n', 'test_name', '30-11-2020', '12345678J')")
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('book 30-11-2020 l sm test_name 12345678J')
+
+        actual_result = fake_stdout.getvalue()
+        expected_result = 'Booking confirmed for room type l of size sm with balcony. Booking id: 2\n'
+        self.assertEqual(actual_result, expected_result)
+
+    def test_book_with_no_rooms_available(self):
+        database.execute_statement(self.cli.conn, f"INSERT INTO bookings (ROOM, NAME_LASTNAME, BOOKING_DATE, CLIENT_ID) VALUES ('l-sm-n', 'test_name', '30-11-2020', '12345678J')")
+        database.execute_statement(self.cli.conn, f"INSERT INTO bookings (ROOM, NAME_LASTNAME, BOOKING_DATE, CLIENT_ID) VALUES ('l-sm-y', 'test_name', '30-11-2020', '12345678J')")
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('book 30-11-2020 l sm test_name 12345678J')
+
+        actual_result = fake_stdout.getvalue()
+        expected_result = 'Error. There is no room available\n'
+        self.assertEqual(actual_result, expected_result)
+    
+    def test_book_with_invalid_date(self):
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('book 29-02-2021 l sm test_name 12345678J')
+
+        actual_result = fake_stdout.getvalue()
+        expected_result = 'Incorrect date. It should be a valid dd-mm-yyyy\n'
+        self.assertEqual(actual_result, expected_result)
+    
+    def test_book_with_invalid_room_size(self):
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('book 30-11-2020 l sb test_name 12345678J')
+
+        actual_result = fake_stdout.getvalue()
+        expected_result = 'Invalid accomodation type sb. Accomodation type must be sm or db.\n'
+        self.assertEqual(actual_result, expected_result)
+
+    def test_book_with_invalid_name_lastname(self):
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('book 30-11-2020 l sm _name 12345678J')
+
+        actual_result = fake_stdout.getvalue()
+        expected_result = 'Invalid name format _name. Name format must be name_lastname (e.g. sira_vegas).\n'
+        self.assertEqual(actual_result, expected_result)
+
+    def test_book_with_invalid_ID(self):
+        with mock.patch('sys.stdout', new=io.StringIO()) as fake_stdout:
+            self.cli.onecmd('book 30-11-2020 l sm test_name 1234567J')
+
+        actual_result = fake_stdout.getvalue()
+        expected_result = 'Invalid DNI 1234567J. DNI format must be 8 numbers and 1 capital letter (e.g. 12345678K).\n'
+        self.assertEqual(actual_result, expected_result)
+
 
 class TestPreference(unittest.TestCase):
 

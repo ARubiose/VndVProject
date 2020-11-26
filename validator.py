@@ -19,12 +19,12 @@ def date_validation(arg):
         datetime.strptime(arg, '%d-%m-%Y')
         return True
     except ValueError:
-        print("Incorrect date format. It should be dd-mm-yyyy")
+        print("Incorrect date. It should be a valid dd-mm-yyyy")
         return False
 
 def num_arg_validation(valid_num, actual_num):
     if(valid_num != actual_num):
-        print (f'Invalid number of argument. It must be {valid_num}.')
+        print (f'Invalid number of arguments. It must be {valid_num}.')
         return False
     return True
 
