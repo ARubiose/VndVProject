@@ -86,12 +86,10 @@ class BookItShell(cmd.Cmd):
         exit(0)
 
     # ----- override commands ----- #
-    def do_help(self, arg):
-        guide()
 
     def default(self, arg):
         ''' Print a command not recognized error message '''
-        print(f" {arg} is not a valid command")
+        print(f"{arg} is not a valid command")
 
 if __name__ == '__main__':
     # Console object

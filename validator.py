@@ -2,7 +2,7 @@ from datetime import datetime
 import re
 
 def room_validation(arg):
-    if arg not in ['l', 'g', 's', 'a']:
+    if arg not in ['l', 'g', 's', 'p', 'a']:
         print(f"Invalid room type {arg}. Room type must be l, g, s or a.")
         return False
     return True

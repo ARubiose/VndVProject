@@ -27,7 +27,7 @@ def preference(conn, booking_ID, selection):
         return
 
     room = booking[1].split('-')
-    #Fault --> 
+    preference_room = '-'.join([room[0], room[1], selection])
 
     # Update preference
     if room[2] == selection:
@@ -36,8 +36,8 @@ def preference(conn, booking_ID, selection):
     else:
         available_rooms = check(conn, booking[3], room[0])
 
-        if available_rooms[booking[1]] > 0:
-            c.execute(f"UPDATE bookings SET ROOM = '{room[0] + '-' + room[1] + '-' + selection}' where ID = {booking_ID}")
+        if available_rooms[preference_room] > 0:
+            c.execute(f"UPDATE bookings SET ROOM = '{preference_room}' where ID = {booking_ID}")
             conn.commit()
             print("Preference saved")
         else:
